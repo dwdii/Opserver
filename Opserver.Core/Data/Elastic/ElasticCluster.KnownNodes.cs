@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -22,6 +23,9 @@ namespace StackExchange.Opserver.Data.Elastic
             public int Port { get; set; }
             public string Url { get; set; }
 
+            public ICredentials Credentials { get; private set; }
+            public bool IgnoreCertErrors { get; private set; }
+
             public string Name => LastStatus?.Name;
             public string ClusterName => LastStatus?.ClusterName;
             public NodeHomeInfo.VersionInfo Version => LastStatus?.Version;
@@ -30,8 +34,11 @@ namespace StackExchange.Opserver.Data.Elastic
             public Exception LastException { get; private set; }
             public NodeHomeInfo LastStatus { get; set; }
 
-            public ElasticNode(string hostAndPort)
+            public ElasticNode(string hostAndPort, ICredentials cred, bool ignoreCertError)
             {
+                Credentials = cred;
+                IgnoreCertErrors = ignoreCertError;
+
                 if (Uri.TryCreate(hostAndPort, UriKind.Absolute, out Uri uri))
                 {
                     Url = uri.ToString();
@@ -72,6 +79,19 @@ namespace StackExchange.Opserver.Data.Elastic
                 var wc = new WebClient();
                 try
                 {
+                    if (IgnoreCertErrors)
+                    {
+                        ServicePointManager.ServerCertificateValidationCallback =
+                           new RemoteCertificateValidationCallback(
+                                delegate
+                                { return true; }
+                            );
+                    }
+                    if(null != Credentials)
+                    {
+                        wc.Credentials = Credentials;
+                    }
+
                     using (var rs = await wc.OpenReadTaskAsync(Url + path).ConfigureAwait(false))
                     using (var sr = new StreamReader(rs))
                     {

@@ -27,6 +27,21 @@ namespace StackExchange.Opserver
             public string Description { get; set; }
 
             /// <summary>
+            /// ElasticSearch username (a la X-Pack)
+            /// </summary>
+            public string Username { get; set; }
+
+            /// <summary>
+            /// ElasticSearch user's password, base64 encoded
+            /// </summary>
+            public string PasswordBase64 { get; set; }
+
+            /// <summary>
+            /// Ignore HTTPS certificate validation errors (or not)
+            /// </summary>
+            public bool IgnoreCertErrors { get; set; }
+
+            /// <summary>
             /// How many seconds before polling this cluster for status again
             /// </summary>
             public int RefreshIntervalSeconds { get; set; } = 120;
