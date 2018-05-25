@@ -14,7 +14,12 @@
         "ny-search01",
         "ny-search02",
         "ny-search03"
-      ]
+      ],
+
+      "Username": null, // Name of Elastic X-Pack user to authenticate as
+      "PasswordBase64": null, // Username's base64 encoded password 
+      "IgnoreCertErrors": false // If true, then ignore HTTPS certificate validation errors
+
     },
     {
       "name": "NY Development",
